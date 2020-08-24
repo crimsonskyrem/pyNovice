@@ -12,6 +12,7 @@ from pygame.locals import (
     K_ESCAPE,
     KEYDOWN,
     QUIT,
+    RLEACCEL,
 )
 
 # Define constants for the screen width and height
@@ -27,8 +28,10 @@ pygame.time.set_timer(ADDENEMY, 250)
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super(Player, self).__init__()
-        self.surf = pygame.Surface((75, 25))
-        self.surf.fill((255, 255, 255))
+        self.surf = pygame.image.load("jet.png").convert()
+        self.surf.set_colorkey((255, 255, 255), RLEACCEL)
+        # self.surf = pygame.Surface((75, 25))
+        # self.surf.fill((255, 255, 255))
         self.rect = self.surf.get_rect()
 
     # Move the sprite based on user keypresses
@@ -52,14 +55,14 @@ class Player(pygame.sprite.Sprite):
             self.rect.bottom = SCREEN_HEIGHT
 
 # Define the enemy object by extending pygame.sprite.Sprite
-
 # The surface you draw on the screen is now an attribute of 'enemy'
-
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
         super(Enemy, self).__init__()
-        self.surf = pygame.Surface((20, 10))
-        self.surf.fill((255, 255, 255))
+        self.surf = pygame.image.load("missile.png").convert()
+        self.surf.set_colorkey((255, 255, 255), RLEACCEL)
+        # self.surf = pygame.Surface((20, 10))
+        # self.surf.fill((255, 255, 255))
         self.rect = self.surf.get_rect(
             center=(
                 random.randint(SCREEN_WIDTH + 20, SCREEN_WIDTH + 100),
@@ -95,7 +98,6 @@ all_sprites.add(player)
 # Variable to keep the main loop running
 running = True
 # Main loop
-
 while running:
     # for loop through the event queue
     for event in pygame.event.get():
@@ -131,8 +133,12 @@ while running:
     for entity in all_sprites:
         screen.blit(entity.surf, entity.rect)
 
-    # # Draw the player on the screen
-    # screen.blit(player.surf, player.rect)
+    # Check if any enemies have collided with the player
+    if pygame.sprite.spritecollideany(player, enemies):
+        # If so, then remove the player and stop the loop
+        player.kill()
+        running = False
+
 
     # Update the display
     pygame.display.update()

@@ -55,39 +55,38 @@ class snake(object):
 
             keys = pygame.key.get_pressed()
 
-            for key in keys:
-                if keys[pygame.K_LEFT]:
-                    self.dirnx = -1
-                    self.dirny = 0
-                    self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
+            if keys[pygame.K_LEFT]:
+                self.dirnx = -1
+                self.dirny = 0
+                self.turns[self.head.pos] = [self.dirnx, self.dirny]
 
-                elif keys[pygame.K_RIGHT]:
-                    self.dirnx = 1
-                    self.dirny = 0
-                    self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
+            elif keys[pygame.K_RIGHT]:
+                self.dirnx = 1
+                self.dirny = 0
+                self.turns[self.head.pos] = [self.dirnx, self.dirny]
 
-                elif keys[pygame.K_UP]:
-                    self.dirnx = 0
-                    self.dirny = -1
-                    self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
+            elif keys[pygame.K_UP]:
+                self.dirnx = 0
+                self.dirny = -1
+                self.turns[self.head.pos] = [self.dirnx, self.dirny]
 
-                elif keys[pygame.K_DOWN]:
-                    self.dirnx = 0
-                    self.dirny = 1
-                    self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
+            elif keys[pygame.K_DOWN]:
+                self.dirnx = 0
+                self.dirny = 1
+                self.turns[self.head.pos] = [self.dirnx, self.dirny]
 
         for i, c in enumerate(self.body):
-            p = c.pos[:]
+            p = c.pos
             if p in self.turns:
                 turn = self.turns[p]
                 c.move(turn[0],turn[1])
                 if i == len(self.body)-1:
                     self.turns.pop(p)
             else:
-                if c.dirnx == -1 and c.pos[0] <= 0: c.pos = (c.rows-1, c.pos[1])
-                elif c.dirnx == 1 and c.pos[0] >= c.rows-1: c.pos = (0,c.pos[1])
-                elif c.dirny == 1 and c.pos[1] >= c.rows-1: c.pos = (c.pos[0], 0)
-                elif c.dirny == -1 and c.pos[1] <= 0: c.pos = (c.pos[0],c.rows-1)
+                if c.dirnx == -1 and c.pos[0] <= 0: flag = False#c.pos = (c.rows-1, c.pos[1])
+                elif c.dirnx == 1 and c.pos[0] >= c.rows-1: flag = False# c.pos = (0,c.pos[1])
+                elif c.dirny == 1 and c.pos[1] >= c.rows-1: flag = False# c.pos = (c.pos[0], 0)
+                elif c.dirny == -1 and c.pos[1] <= 0: flag = False# c.pos = (c.pos[0],c.rows-1)
                 else: c.move(c.dirnx,c.dirny)
         
 
@@ -154,7 +153,7 @@ def randomSnack(rows, item):
     while True:
         x = random.randrange(rows)
         y = random.randrange(rows)
-        if len(list(filter(lambda z:z.pos == (x,y), positions))) > 0:
+        if (x,y) in positions:
             continue
         else:
             break
@@ -188,12 +187,12 @@ def main():
         pygame.time.delay(50)
         clock.tick(10)
         s.move()
-        if s.body[0].pos == snack.pos:
+        if s.head.pos == snack.pos:
             s.addCube()
             snack = cube(randomSnack(rows, s), color=(0,255,0))
 
         for x in range(len(s.body)):
-            if s.body[x].pos in list(map(lambda z:z.pos,s.body[x+1:])):
+            if s.head.pos in list(map(lambda z:z.pos,s.body[1:])):
                 print('Score: ', len(s.body))
                 # message_box('You Lost!', 'Play again...')
                 s.reset((10,10))
